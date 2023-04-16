@@ -20,11 +20,30 @@ def load_cars_otions():
     file_path = './src/cars-av-by_card_options.csv'
     return load_file(file_path)
 
-def extruct_cars():
-    print('extruct cars - to implement')
+def extruct_cars(cars):
+    result = {}
+    for car in cars:
+        result[car["card_id"]] = car
+    return result
 
-def extruct_title():
-    print('extruct title - to implement')
+def extruct_title(cars):
+    for car in cars:
+        #'Продажа Geely Emgrand II, 2023 г. в Минске'
+        # type, brand, model, restailing, no, plases, year, location
+        base = car["title"].replace(" · ", "%").replace(".", "%")
+        type = car["title"].split()[0]
+        brand = car["title"].split()[1]
+        model = base.split("%")[0][base.find(brand) + len(brand) + 1:]
+        restailing = "1" # car["title"].split("·")[1]
+        no = "1" #car["title"].split("·")[2].spleat(",")[0]
+        plases = "plases"
+        year = car["title"].split(".")[0][-6:-2]
+        location_type = car["title"].split(".")[0][-1:]
+        location = car["title"].split(".")[1][3:]
+        car["title"] = {"type": type, "brand": brand, "model": model, "restailing": restailing, "no": no,
+                        "plases": plases, "year": year, "location_type": location_type,  "location": location,
+                        "base": base}
+    return cars
 
 def extruct_description():
     print('extruct description - to implement')
@@ -46,16 +65,12 @@ def show_cars():
 
 if __name__ == '__main__':
     cars = load_cars()
-    print(type(cars))
-    print(len(cars))
-    print(cars[0])
-    print(type(cars[0]))
     cars_gallery = load_cars_gallery()
-    print(len(cars_gallery))
-    print(cars_gallery[0])
     cars_options = load_cars_otions()
-    print(len(cars_options))
-    print(cars_options[0])
+    cars = extruct_title(cars)
+    cars = extruct_cars(cars)
+    #print(cars["103779165"])
+    print(cars["104190182"])
 
     # extruct_cars()
     # extruct_title()
