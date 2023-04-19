@@ -1,4 +1,6 @@
 import csv
+from tabulate import tabulate
+import pandas as pd
 
 def load_file(file_path):
     result = []
@@ -8,17 +10,21 @@ def load_file(file_path):
             result.append(row)
     return result
 
+
 def load_cars():
     file_path = './src/cars-av-by_card.csv'
     return load_file(file_path)
+
 
 def load_cars_gallery():
     file_path = './src/cars-av-by_card_gallery.csv'
     return load_file(file_path)
 
+
 def load_cars_otions():
     file_path = './src/cars-av-by_card_options.csv'
     return load_file(file_path)
+
 
 def extruct_cars(cars):
     result = {}
@@ -63,6 +69,7 @@ def extruct_title(cars):
             "no": no, "plases": plases, "year": year,  "location": location
         }
     return cars
+
 
 def extruct_description(cars):
     for car in cars:
@@ -114,20 +121,51 @@ def extruct_description(cars):
         }
     return cars
 
+
 def extruct_comment():
     print('extruct comment - to implement')
+
 
 def add_cars_gallery_to_cars():
     print('add cars gallery to cars - to implement')
 
+
 def add_cars_options_to_cars():
     print('add cars options to cars - to implement')
 
-def aplly_filter():
-    print('aplly filter - to implement')
 
-def show_cars():
-    print('show_cars - to implement')
+def aplly_filter(cars):
+    result = {}
+    for id in cars:
+        filter_1 = cars[id]["labels"] == 'VIN'
+        filter_2 = cars[id]["title"]["brand"] == 'Geely'
+        filter_3 = cars[id]["description"]["fuel"] == 'бензин'
+        is_added = filter_1 and filter_2 and filter_3
+        if is_added:
+            result[id] = cars[id]
+    return result
+
+
+def show_cars(cars):
+    df = pd.DataFrame(cars)
+    print(tabulate(df.T, headers="keys"))
+    # print(f"find: {len(cars)}")
+    # data = [{"title": "id", "data_name": "card_id", "len_column": 15}]
+    # for d in data:
+    #     print_column(d["title"])
+    #
+    # for car in cars:
+    #     print_column(cars[car]["card_id"], 10)
+
+
+# def print_column(data, len_column):
+#     is_fit = len_column - 4 >= len(data)
+#     if is_fit:
+#         show_data = data
+#     else:
+#         show_data = data[:len_column-5] + "..."
+#     print("| " + show_data + " |")
+
 
 if __name__ == '__main__':
     cars = load_cars()
@@ -141,7 +179,5 @@ if __name__ == '__main__':
     cars = extruct_cars(cars)
     # add_cars_gallery_to_cars()
     # add_cars_options_to_cars()
-    # aplly_filter()
-    # show_cars()
-
-    print(cars["101410920"]["description"])
+    cars = aplly_filter(cars)
+    show_cars(cars)
