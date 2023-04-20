@@ -1,6 +1,5 @@
 import csv
 from tabulate import tabulate
-import pandas as pd
 
 def load_file(file_path):
     result = []
@@ -126,12 +125,25 @@ def extruct_comment():
     print('extruct comment - to implement')
 
 
-def add_cars_gallery_to_cars():
-    print('add cars gallery to cars - to implement')
+def add_cars_gallery_to_cars(cars, car_gallery):
+    for row in car_gallery:  # 'card_id', 'ind', 'url', 'scrap_date'
+        id = row["card_id"]
+        if id in cars:
+            if "gallery" in cars[id]:
+                cars[id]["gallery"].append(row)
+            else:
+                cars[id]["gallery"] = [row]
+    return cars
 
-
-def add_cars_options_to_cars():
-    print('add cars options to cars - to implement')
+def add_cars_options_to_cars(cars, cars_options):
+    for row in cars_options: # 'card_id', 'category', 'item', 'scrap_date'
+        id = row["card_id"]
+        if id in cars:
+            if "options" in cars[id]:
+                cars[id]["options"].append(row)
+            else:
+                cars[id]["options"] = [row]
+    return cars
 
 
 def aplly_filter(cars):
@@ -147,37 +159,38 @@ def aplly_filter(cars):
 
 
 def show_cars(cars):
-    df = pd.DataFrame(cars)
-    print(tabulate(df.T, headers="keys"))
-    # print(f"find: {len(cars)}")
-    # data = [{"title": "id", "data_name": "card_id", "len_column": 15}]
-    # for d in data:
-    #     print_column(d["title"])
-    #
-    # for car in cars:
-    #     print_column(cars[car]["card_id"], 10)
+    headers = ["id", "price", "brand", "model", "year", "transmission", "engine", "mileage", "body", "images", "options"]
+    data = []
+    for id in cars:
+        data.append([
+            cars[id]["card_id"],
+            cars[id]["price_primary"],
+            cars[id]["title"]["brand"],
+            cars[id]["title"]["model"],
+            cars[id]["description"]["year"],
+            cars[id]["description"]["transmission"],
+            cars[id]["description"]["engine"],
+            cars[id]["description"]["mileage"],
+            cars[id]["description"]["body"],
+            len(cars[id]["gallery"]) if "gallery" in cars[id] else 0,
+            len(cars[id]["options"]) if "options" in cars[id] else 0,
+        ])
 
-
-# def print_column(data, len_column):
-#     is_fit = len_column - 4 >= len(data)
-#     if is_fit:
-#         show_data = data
-#     else:
-#         show_data = data[:len_column-5] + "..."
-#     print("| " + show_data + " |")
+    print(tabulate(data, headers=headers))
 
 
 if __name__ == '__main__':
+    ## Load
     cars = load_cars()
-    # load_cars_gallery()
-    # load_cars_otions()
     cars_gallery = load_cars_gallery()
     cars_options = load_cars_otions()
+    ## Transformation
     cars = extruct_title(cars)
     cars = extruct_description(cars)
     # extruct_comment()
     cars = extruct_cars(cars)
-    # add_cars_gallery_to_cars()
-    # add_cars_options_to_cars()
+    cars = add_cars_gallery_to_cars(cars, cars_gallery)
+    cars = add_cars_options_to_cars(cars, cars_options)
+    ##
     cars = aplly_filter(cars)
     show_cars(cars)
